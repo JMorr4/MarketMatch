@@ -9,5 +9,13 @@ namespace MarketMatch.Data
             : base(options)
         {
         }
+
+        public DbSet<MarketMatch.Models.Supermarket> Supermarket { get; set; } = default!;
+
+        public DbSet<MarketMatch.Models.Product>? Product { get; set; }
+
+        public DbSet<MarketMatch.Models.ProductPrice>? ProductPrice { get; set; }
+
+        public DbSet<MarketMatch.Models.ShoppingList>? ShoppingList { get; set; }
     }
 }
