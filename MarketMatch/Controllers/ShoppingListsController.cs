@@ -25,8 +25,14 @@ namespace MarketMatch.Controllers
             // Make Product available to the view so we can display product attributes in the shopping list
             ViewBag.Product = _context.Product;
             
+            // Get the user's list id
+            ControllerUtils utils = new ControllerUtils(); 
+            string? userListId = utils.getUserListId(HttpContext, Response);
+
+
+            // Filter shoppinglist by userListId so they see the correct list
               return _context.ShoppingList != null ? 
-                          View(await _context.ShoppingList.ToListAsync()) :
+              View(await _context.ShoppingList.Where(u => u.UserListId.Equals(userListId)).ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.ShoppingList'  is null.");
         }
 
