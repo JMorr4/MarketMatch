@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MarketMatch.Models;
 using MarketMatch.Data;
 using MarketMatch.Models;
 
@@ -13,10 +14,12 @@ namespace MarketMatch.Controllers
     public class SupermarketsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public SupermarketsController(ApplicationDbContext context)
+        public SupermarketsController(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env; // We need this to access the web root path (WebRootPath)
         }
 
         // GET: Supermarkets
@@ -56,8 +59,13 @@ namespace MarketMatch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SupermarketId,Name,Logo")] Supermarket supermarket)
+        public async Task<IActionResult> Create([Bind("SupermarketId,Name,Logo,LogoFile")] Supermarket supermarket)
         {
+            // Ignore invalid status of data pointed to by the foreign key as not relevant here
+            ModelState.Remove(nameof(Supermarket.ProductPrices));
+
+            await UploadSupermarketFile(supermarket);
+
             if (ModelState.IsValid)
             {
                 _context.Add(supermarket);
@@ -88,12 +96,17 @@ namespace MarketMatch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SupermarketId,Name,Logo")] Supermarket supermarket)
+        public async Task<IActionResult> Edit(int id, [Bind("SupermarketId,Name,Logo,LogoFile")] Supermarket supermarket)
         {
             if (id != supermarket.SupermarketId)
             {
                 return NotFound();
             }
+
+            // Ignore invalid status of data pointed to by the foreign key as not relevant here
+            ModelState.Remove(nameof(Supermarket.ProductPrices));
+
+            await UploadSupermarketFile(supermarket);
 
             if (ModelState.IsValid)
             {
@@ -159,5 +172,36 @@ namespace MarketMatch.Controllers
         {
           return (_context.Supermarket?.Any(e => e.SupermarketId == id)).GetValueOrDefault();
         }
+
+        // Function to copy the uploaded file to the webserver 
+        private async Task<Boolean> UploadSupermarketFile(Supermarket supermarket)
+        {
+            if (supermarket != null)
+            {
+                // Extract filename from passed to save in the db
+                supermarket.Logo = supermarket.LogoFile.FileName;
+
+                // Mark as valid
+                ModelState.ClearValidationState("Logo");
+                ModelState.MarkFieldValid("Logo");
+
+                // check if any file is uploaded
+                var work = supermarket.LogoFile;
+
+                if (work != null)
+                {
+                    var filePath = Path.Combine(_env.WebRootPath, "images", supermarket.LogoFile.FileName);
+
+                    // open-create the file in a stream and copy the uploaded file content into 
+                    // the new file (IFormFile contains a stream) 
+                    using (var fileSteam = new FileStream(filePath, FileMode.Create))
+                    {
+                        await work.CopyToAsync(fileSteam);
+                    }
+                }
+            }
+            return true;
+        }
+
     }
 }

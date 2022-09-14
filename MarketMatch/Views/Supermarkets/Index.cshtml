@@ -28,11 +28,11 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Logo)
+                <img src='~/images/@item.Logo' width="80" height="80"/>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.SupermarketId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SupermarketId">Details</a> |
+                <a asp-action="Details" asp-route-id="@item.SupermarketId">Details</a>
                 <a asp-action="Delete" asp-route-id="@item.SupermarketId">Delete</a>
             </td>
         </tr>
