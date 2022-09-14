@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MarketMatch.Models;
 using MarketMatch.Data;
-using MarketMatch.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MarketMatch.Controllers
 {
+    [Authorize]
     public class SupermarketsController : Controller
     {
         private readonly ApplicationDbContext _context;
