@@ -22,6 +22,9 @@ namespace MarketMatch.Controllers
         // GET: ShoppingLists
         public async Task<IActionResult> Index()
         {
+            // Make Product available to the view so we can display product attributes in the shopping list
+            ViewBag.Product = _context.Product;
+            
               return _context.ShoppingList != null ? 
                           View(await _context.ShoppingList.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.ShoppingList'  is null.");
@@ -80,6 +83,10 @@ namespace MarketMatch.Controllers
             {
                 return NotFound();
             }
+
+            // Make Product available to the view so we can display product attributes in the shopping list
+            ViewBag.Product = _context.Product.Find(shoppingList.ProductId);
+
             return View(shoppingList);
         }
 
@@ -115,6 +122,10 @@ namespace MarketMatch.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // Make Product available to the view so we can display product attributes in the shopping list
+            ViewBag.Product = _context.Product.Find(shoppingList.ProductId);
+
             return View(shoppingList);
         }
 
@@ -132,6 +143,9 @@ namespace MarketMatch.Controllers
             {
                 return NotFound();
             }
+
+            // Make Product available to the view so we can display product attributes in the shopping list
+            ViewBag.Product = _context.Product.Find(shoppingList.ProductId);
 
             return View(shoppingList);
         }

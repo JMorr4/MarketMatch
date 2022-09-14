@@ -13,7 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserListId)
+                Product
+            </th>
+            <th>
+                Size
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
@@ -22,17 +25,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model)
+{
+    // Find the related product
+    var product = new Product();
+    @foreach (Product p in ViewBag.Product)
+    {
+        if (item.ProductId == p.ProductId)
+        {
+            product = p;
+            break;
+        }
+}   
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.UserListId)
+                @product.Name
+            </td>
+            <td>
+                @product.Size
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ListId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ListId">Details</a> |
+<!--                <a asp-action="Details" asp-route-id="@item.ListId">Details</a> |-->
                 <a asp-action="Delete" asp-route-id="@item.ListId">Delete</a>
             </td>
         </tr>
